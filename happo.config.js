@@ -46,6 +46,11 @@ export default defineConfig({
         path.join(outDir, 'styles.css'),
       );
 
+      fs.copyFileSync(
+        path.resolve(__dirname, 'logo.svg'),
+        path.join(outDir, 'logo.svg'),
+      );
+
       fs.writeFileSync(
         path.join(outDir, 'iframe.html'),
         `<!DOCTYPE html>
@@ -53,6 +58,8 @@ export default defineConfig({
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
