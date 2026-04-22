@@ -245,6 +245,23 @@ class SquirrelOrderView extends LitElement {
     this.dispatchEvent(new CustomEvent(type, { bubbles: true, composed: true, detail }));
   }
 
+  _formatDonationString(raw) {
+    const v = String(raw ?? '').trim();
+    if (v === '') return '';
+
+    // Keep an in-progress trailing decimal (e.g. "1.") so typing isn't jarring.
+    if (/^\d+\.$/.test(v)) return v;
+
+    // Ensure whole-dollar and one-decimal values stay in x.xx form.
+    if (/^\d+$/.test(v)) return `${v}.00`;
+    if (/^\d+\.\d$/.test(v)) return `${v}0`;
+
+    // For other numeric inputs, clamp to two decimals when parseable.
+    const n = Number(v);
+    if (!Number.isFinite(n) || n < 0) return v;
+    return n.toFixed(2);
+  }
+
   _renderOrderSummary() {
     const ordered = this.items.filter((i) => this.qty[i.id] > 0);
     const donation = this._donationValue;
@@ -301,6 +318,9 @@ class SquirrelOrderView extends LitElement {
   }
 
   render() {
+    const quickDonations = [...(this.quickDonations ?? [])].sort((a, b) => b - a);
+    const totalIsWholeDollar = Math.round(this._total * 100) % 100 === 0;
+    const showRoundUp = this._subtotal > 0 && !totalIsWholeDollar;
     return html`
       <div class="card">
         <p class="section-label">Menu</p>
@@ -321,7 +341,7 @@ class SquirrelOrderView extends LitElement {
         <p class="section-label">💚 Add a Donation</p>
         <div class="donation-section">
           <div class="donation-quick-row">
-            ${this.quickDonations.map(
+            ${quickDonations.map(
               (amt) => html`
                 <button
                   class="donation-quick-btn"
@@ -331,9 +351,11 @@ class SquirrelOrderView extends LitElement {
                 </button>
               `,
             )}
-            <button class="donation-quick-btn" @click=${() => this._emit('round-up')}>
-              Round Up
-            </button>
+            ${showRoundUp
+              ? html`<button class="donation-quick-btn" @click=${() => this._emit('round-up')}>
+                  Round Up
+                </button>`
+              : nothing}
           </div>
           <div class="donation-input-row">
             <div class="donation-input-wrap">
@@ -344,9 +366,13 @@ class SquirrelOrderView extends LitElement {
                 class="donation-input"
                 placeholder="0.00"
                 min="0"
-                step="0.01"
+                step="1.00"
                 .value=${live(this.donation)}
                 @input=${(e) => this._emit('donation-change', { value: e.target.value })}
+                @change=${(e) =>
+                  this._emit('donation-change', { value: this._formatDonationString(e.target.value) })}
+                @blur=${(e) =>
+                  this._emit('donation-change', { value: this._formatDonationString(e.target.value) })}
               />
               <button
                 class="donation-clear-btn"
