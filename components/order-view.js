@@ -53,10 +53,14 @@ class SquirrelOrderView extends LitElement {
 
       .order-summary {
         background: var(--white);
-        border: 1px solid var(--border);
+        border: 2px solid var(--border);
         border-radius: 14px;
         margin-bottom: 22px;
         overflow: hidden;
+      }
+
+      .order-summary.has-total {
+        border-color: #000;
       }
 
       .order-empty {
@@ -404,6 +408,12 @@ class SquirrelOrderView extends LitElement {
                 </div>
               </div>
               <div class="donation-quick-row">
+                <button
+                  class="donation-quick-btn"
+                  @click=${() => this._emit('donation-change', { value: '' })}
+                >
+                  Clear
+                </button>
                 ${quickDonations.map(
                   (amt) => html`
                     <button
@@ -424,7 +434,9 @@ class SquirrelOrderView extends LitElement {
           </div>
 
           <p class="section-label">Order</p>
-          <div class="order-summary">${this._renderOrderSummary()}</div>
+          <div class=${classMap({ 'order-summary': true, 'has-total': this._total > 0 })}>
+            ${this._renderOrderSummary()}
+          </div>
         </div>
       </div>
 
