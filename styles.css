@@ -1,15 +1,15 @@
 :root {
-  --red: #b83a22;
-  --dark-red: #8b2a16;
-  --brown: #2c1a0e;
-  --cream: #fff9f2;
-  --white: #ffffff;
-  --green: #2a6b2e;
-  --gold: #c68a0a;
-  --border: #d4b48a;
-  --muted: #9a8070;
-  --venmo: #008cff;
-  --paypal: #003087;
+  --red: oklch(0.5298 0.1664 32.9);
+  --dark-red: oklch(0.4314 0.1352 33.4);
+  --brown: oklch(0.2382 0.0356 53.9);
+  --cream: oklch(0.9848 0.0112 71.8);
+  --white: oklch(1 0 none);
+  --green: oklch(0.4705 0.1147 144.6);
+  --gold: oklch(0.6761 0.1392 77.4);
+  --border: oklch(0.7877 0.0671 74.1);
+  --muted: oklch(0.549 0.0334 50.2);
+  --venmo: oklch(0.6406 0.1974 253);
+  --paypal: oklch(0.3466 0.153 261.3);
 }
 
 *,
