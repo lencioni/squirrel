@@ -10,14 +10,14 @@ class SquirrelApp extends LitElement {
     }
 
     .header {
-      padding: 24px 16px 0;
+      padding: 0.25rlh 1rem 0;
       text-align: center;
     }
 
     .header-logo {
-      width: 110px;
-      height: 110px;
-      margin: 0 auto 10px;
+      aspect-ratio: 1 / 1;
+      width: 50px;
+      margin: 0 auto -1rlh;
       display: block;
     }
 

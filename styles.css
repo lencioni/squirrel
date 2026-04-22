@@ -10,6 +10,7 @@
   --muted: oklch(0.549 0.0334 50.2);
   --venmo: oklch(0.5695 0.1751 252.91);
   --paypal: oklch(0.3466 0.153 261.3);
+  --focus-ring: #68c4ef;
 }
 
 *,
@@ -38,4 +39,17 @@ button {
   touch-action: manipulation;
   cursor: pointer;
   border: none;
+}
+
+/* Visually hide while keeping accessible to screen readers */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }

@@ -1,4 +1,5 @@
 import { LitElement, css, html, nothing } from 'lit';
+import { classMap } from 'lit/directives/class-map.js';
 import { live } from 'lit/directives/live.js';
 import { fmt } from '../utils.js';
 import { buttonBaseStyles, cardStyles, sectionLabelStyles } from './shared-styles.js';
@@ -12,6 +13,23 @@ class SquirrelOrderView extends LitElement {
     css`
       :host {
         display: block;
+        min-height: 100vh;
+        background: var(--cream);
+      }
+
+      .content {
+        padding-bottom: calc(88px + env(safe-area-inset-bottom));
+      }
+
+      .pay-footer {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 0 0 env(safe-area-inset-bottom);
+        background: var(--cream);
+        border-top: 1px solid var(--border);
+        z-index: 10;
       }
 
       .menu-grid {
@@ -19,6 +37,18 @@ class SquirrelOrderView extends LitElement {
         grid-template-columns: 1fr 1fr;
         gap: 10px;
         margin-bottom: 22px;
+      }
+
+      .sr-only {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        padding: 0 !important;
+        margin: -1px !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important;
+        border: 0 !important;
       }
 
       .order-summary {
@@ -56,6 +86,11 @@ class SquirrelOrderView extends LitElement {
         gap: 4px;
       }
 
+      .order-row-emoji {
+        font-size: 1.05rem;
+        line-height: 1;
+      }
+
       .order-row-name {
         font-weight: 800;
       }
@@ -77,50 +112,85 @@ class SquirrelOrderView extends LitElement {
         margin-bottom: 22px;
       }
 
+      .donation-controls {
+        background: white;
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        padding: 0;
+        display: grid;
+        gap: 0;
+        overflow: hidden;
+      }
+
+      .donation-controls.has-donation {
+        border-color: var(--green);
+        background: #f2fff6;
+      }
+
       .donation-quick-row {
         display: flex;
-        gap: 8px;
-        margin-bottom: 10px;
+        gap: 0;
+        background: var(--border);
       }
 
       .donation-quick-btn {
         flex: 1;
         padding: 11px 6px;
-        border: 2px solid var(--green);
-        border-radius: 10px;
-        background: white;
-        color: var(--green);
+        border: none;
+        background: transparent;
+        color: var(--brown);
         font-weight: 800;
         font-size: 0.9rem;
         touch-action: manipulation;
-        transition:
-          background 0.1s,
-          color 0.1s;
+        transition: background 0.1s;
       }
 
       .donation-quick-btn:active {
+        background: rgba(0 0 0 / 0.06);
+      }
+
+      .donation-quick-btn:focus {
+        outline: none;
+      }
+
+      .donation-quick-btn:focus-visible {
+        /* Inset ring so it doesn't get clipped by the row/container */
+        box-shadow: inset 0 0 0 3px var(--focus-ring);
+      }
+
+      .donation-quick-btn + .donation-quick-btn {
+        border-left: 1px solid rgba(0 0 0 / 0.12);
+      }
+
+      .donation-controls.has-donation .donation-quick-row {
         background: var(--green);
+      }
+
+      .donation-controls.has-donation .donation-quick-btn {
         color: white;
+      }
+
+      .donation-controls.has-donation .donation-quick-btn:active {
+        background: rgba(255 255 255 / 0.16);
+      }
+
+      .donation-controls.has-donation .donation-quick-btn + .donation-quick-btn {
+        border-left-color: rgba(255 255 255 / 0.22);
       }
 
       .donation-input-row {
         display: flex;
         gap: 8px;
         align-items: stretch;
+        padding: 10px;
       }
 
       .donation-input-wrap {
         display: flex;
         align-items: center;
-        background: white;
-        border: 2px solid var(--border);
+        background: transparent;
         border-radius: 10px;
         overflow: hidden;
-        transition: border-color 0.15s;
-      }
-
-      .donation-input-wrap:focus-within {
-        border-color: var(--green);
       }
 
       .donation-prefix {
@@ -141,47 +211,32 @@ class SquirrelOrderView extends LitElement {
         color: inherit;
         background: transparent;
         min-width: 0;
+        text-align: left;
       }
 
       .donation-input:focus {
         outline: none;
       }
 
-      .donation-clear-btn {
-        padding: 0 12px;
-        background: transparent;
-        color: var(--muted);
-        font-weight: 700;
-        font-size: 0.85rem;
-        border: none;
-        align-self: stretch;
-        touch-action: manipulation;
+      /* Hide number steppers/spinners for a cleaner donation field */
+      .donation-input[type='number'] {
+        appearance: textfield;
+        -moz-appearance: textfield;
       }
 
-      .donation-clear-btn:active {
-        color: var(--red);
-      }
-
-      .totals-section {
-        margin-bottom: 14px;
-      }
-
-      .subtotal-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 4px 4px;
-        font-size: 0.85rem;
-        color: var(--muted);
+      .donation-input[type='number']::-webkit-outer-spin-button,
+      .donation-input[type='number']::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
       }
 
       .total-bar {
         background: var(--brown);
-        border-radius: 14px;
         padding: 14px 18px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-top: 6px;
+        border-top: 1px solid #f0e6da;
       }
 
       .total-label {
@@ -201,7 +256,7 @@ class SquirrelOrderView extends LitElement {
         padding: 18px;
         background: var(--red);
         color: white;
-        border-radius: 14px;
+        border-radius: 0;
         font-family: 'Fredoka One', cursive;
         font-size: 1.25rem;
         letter-spacing: 0.5px;
@@ -245,9 +300,27 @@ class SquirrelOrderView extends LitElement {
     this.dispatchEvent(new CustomEvent(type, { bubbles: true, composed: true, detail }));
   }
 
+  _formatDonationString(raw) {
+    const v = String(raw ?? '').trim();
+    if (v === '') return '';
+
+    // Keep an in-progress trailing decimal (e.g. "1.") so typing isn't jarring.
+    if (/^\d+\.$/.test(v)) return v;
+
+    // Ensure whole-dollar and one-decimal values stay in x.xx form.
+    if (/^\d+$/.test(v)) return `${v}.00`;
+    if (/^\d+\.\d$/.test(v)) return `${v}0`;
+
+    // For other numeric inputs, clamp to two decimals when parseable.
+    const n = Number(v);
+    if (!Number.isFinite(n) || n < 0) return v;
+    return n.toFixed(2);
+  }
+
   _renderOrderSummary() {
     const ordered = this.items.filter((i) => this.qty[i.id] > 0);
     const donation = this._donationValue;
+    const tot = this._total;
 
     if (ordered.length === 0 && donation === 0) {
       return html`<div class="order-empty">No items yet — tap to add!</div>`;
@@ -258,6 +331,7 @@ class SquirrelOrderView extends LitElement {
         (item) => html`
           <div class="order-row">
             <div class="order-row-left">
+              <span class="order-row-emoji">${item.emoji}</span>
               <span class="order-row-name">${item.name}</span>
               <span class="order-row-meta">× ${this.qty[item.id]}</span>
             </div>
@@ -275,24 +349,6 @@ class SquirrelOrderView extends LitElement {
             </div>
           `
         : nothing}
-    `;
-  }
-
-  _renderTotals() {
-    const sub = this._subtotal;
-    const don = this._donationValue;
-    const tot = this._total;
-    return html`
-      ${don > 0 && sub > 0
-        ? html`
-            <div class="subtotal-row">
-              <span>Subtotal</span><span>${fmt(sub)}</span>
-            </div>
-            <div class="subtotal-row">
-              <span>Donation</span><span>+${fmt(don)}</span>
-            </div>
-          `
-        : nothing}
       <div class="total-bar">
         <span class="total-label">Total</span>
         <span class="total-amount">${fmt(tot)}</span>
@@ -301,65 +357,78 @@ class SquirrelOrderView extends LitElement {
   }
 
   render() {
+    const quickDonations = [...(this.quickDonations ?? [])].sort((a, b) => b - a);
+    const totalIsWholeDollar = Math.round(this._total * 100) % 100 === 0;
+    const showRoundUp = this._subtotal > 0 && !totalIsWholeDollar;
     return html`
-      <div class="card">
-        <p class="section-label">Menu</p>
-        <div class="menu-grid">
-          ${this.items.map(
-            (item) => html`
-              <squirrel-menu-item
-                .item=${item}
-                .qty=${this.qty[item.id]}
-              ></squirrel-menu-item>
-            `,
-          )}
-        </div>
-
-        <p class="section-label">Order</p>
-        <div class="order-summary">${this._renderOrderSummary()}</div>
-
-        <p class="section-label">💚 Add a Donation</p>
-        <div class="donation-section">
-          <div class="donation-quick-row">
-            ${this.quickDonations.map(
-              (amt) => html`
-                <button
-                  class="donation-quick-btn"
-                  @click=${() => this._emit('quick-donation-add', { amount: amt })}
-                >
-                  +$${amt}
-                </button>
+      <div class="content">
+        <div class="card">
+          <p class="section-label sr-only">Menu</p>
+          <div class="menu-grid">
+            ${this.items.map(
+              (item) => html`
+                <squirrel-menu-item
+                  .item=${item}
+                  .qty=${this.qty[item.id]}
+                ></squirrel-menu-item>
               `,
             )}
-            <button class="donation-quick-btn" @click=${() => this._emit('round-up')}>
-              Round Up
-            </button>
           </div>
-          <div class="donation-input-row">
-            <div class="donation-input-wrap">
-              <span class="donation-prefix">$</span>
-              <input
-                type="number"
-                inputmode="decimal"
-                class="donation-input"
-                placeholder="0.00"
-                min="0"
-                step="0.01"
-                .value=${live(this.donation)}
-                @input=${(e) => this._emit('donation-change', { value: e.target.value })}
-              />
-              <button
-                class="donation-clear-btn"
-                @click=${() => this._emit('donation-change', { value: '' })}
-              >
-                Clear
-              </button>
+
+          <p class="section-label">💚 Add a Donation</p>
+          <div class="donation-section">
+            <div
+              class=${classMap({ 'donation-controls': true, 'has-donation': this._donationValue > 0 })}
+            >
+              <div class="donation-input-row">
+                <div class="donation-input-wrap">
+                  <span class="donation-prefix">$</span>
+                  <input
+                    type="number"
+                    inputmode="decimal"
+                    class="donation-input"
+                    placeholder="0.00"
+                    min="0"
+                    step="1.00"
+                    .value=${live(this.donation)}
+                    @input=${(e) => this._emit('donation-change', { value: e.target.value })}
+                    @change=${(e) =>
+                      this._emit('donation-change', {
+                        value: this._formatDonationString(e.target.value),
+                      })}
+                    @blur=${(e) =>
+                      this._emit('donation-change', {
+                        value: this._formatDonationString(e.target.value),
+                      })}
+                  />
+                </div>
+              </div>
+              <div class="donation-quick-row">
+                ${quickDonations.map(
+                  (amt) => html`
+                    <button
+                      class="donation-quick-btn"
+                      @click=${() => this._emit('quick-donation-add', { amount: amt })}
+                    >
+                      +$${amt}
+                    </button>
+                  `,
+                )}
+                ${showRoundUp
+                  ? html`<button class="donation-quick-btn" @click=${() => this._emit('round-up')}>
+                      Round Up
+                    </button>`
+                  : nothing}
+              </div>
             </div>
           </div>
+
+          <p class="section-label">Order</p>
+          <div class="order-summary">${this._renderOrderSummary()}</div>
         </div>
+      </div>
 
-        <div class="totals-section">${this._renderTotals()}</div>
-
+      <div class="pay-footer" role="region" aria-label="Payment">
         <button
           class="pay-btn"
           ?disabled=${this._total === 0}

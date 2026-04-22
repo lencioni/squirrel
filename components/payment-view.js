@@ -10,6 +10,28 @@ class SquirrelPaymentView extends LitElement {
     css`
       :host {
         display: block;
+        min-height: 100vh;
+        background: var(--cream);
+      }
+
+      .content {
+        padding-bottom: calc(132px + env(safe-area-inset-bottom));
+      }
+
+      .actions-footer {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 0 0 env(safe-area-inset-bottom);
+        background: var(--cream);
+        border-top: 1px solid var(--border);
+        z-index: 10;
+      }
+
+      .actions-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
       }
 
       .payment-header {
@@ -118,17 +140,11 @@ class SquirrelPaymentView extends LitElement {
         word-break: break-all;
       }
 
-      .payment-actions {
-        display: flex;
-        gap: 10px;
-      }
-
       .edit-order-btn {
-        flex: 1;
         padding: 18px;
         background: var(--brown);
         color: white;
-        border-radius: 14px;
+        border-radius: 0;
         font-family: 'Fredoka One', cursive;
         font-size: 1.25rem;
         touch-action: manipulation;
@@ -140,12 +156,11 @@ class SquirrelPaymentView extends LitElement {
       }
 
       .new-order-btn {
-        flex: 1;
         padding: 18px;
         background: white;
         color: var(--brown);
-        border: 2px solid var(--border);
-        border-radius: 14px;
+        border-left: 1px solid rgba(0 0 0 / 0.12);
+        border-radius: 0;
         font-family: 'Fredoka One', cursive;
         font-size: 1.25rem;
         touch-action: manipulation;
@@ -223,7 +238,8 @@ class SquirrelPaymentView extends LitElement {
     const don = this.donationValue;
 
     return html`
-      <div class="card">
+      <div class="content">
+        <div class="card">
         <div class="payment-header">
           <div class="payment-header-label">Total Due</div>
           <div class="payment-total-amount">${fmt(this.total)}</div>
@@ -255,8 +271,11 @@ class SquirrelPaymentView extends LitElement {
             <div class="qr-handle">paypal.com/donate</div>
           </div>
         </div>
+        </div>
+      </div>
 
-        <div class="payment-actions">
+      <div class="actions-footer" role="region" aria-label="Order actions">
+        <div class="actions-grid">
           <button class="edit-order-btn" @click=${() => this._emit('edit-order')}>
             ← Edit Order
           </button>
