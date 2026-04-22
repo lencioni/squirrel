@@ -1,5 +1,7 @@
 # Squirrel Jam Food Order App
 
+View the app at [lencioni.github.io/squirrel](https://lencioni.github.io/squirrel/).
+
 A mobile-friendly food ordering app for Squirrel Jam. Event workers use it to tally orders and show customers a Venmo or PayPal QR code to pay.
 
 ## Setup
@@ -27,16 +29,4 @@ Edit [`config.js`](config.js) to customize the app for your event:
 
 ## Deploying to GitHub Pages
 
-1. Build the app:
-
-   ```sh
-   pnpm build
-   ```
-
-   This outputs static files to the `dist/` folder.
-
-2. Push `dist/` to the `gh-pages` branch:
-
-   ```sh
-   pnpm run deploy
-   ```
+Deploys automatically on pushes to `main` via GitHub Actions (GitHub Pages “GitHub Actions” source).
