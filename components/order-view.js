@@ -97,7 +97,6 @@ class SquirrelOrderView extends LitElement {
               <squirrel-menu-item
                 .item=${item}
                 .qty=${this.qty[item.id]}
-                @qty-change=${(e) => this._emit('qty-change', e.detail)}
               ></squirrel-menu-item>
             `,
           )}
