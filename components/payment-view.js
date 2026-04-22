@@ -1,8 +1,171 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, css, html, nothing } from 'lit';
 import QRCode from 'qrcode';
 import { fmt } from '../utils.js';
+import { buttonBaseStyles, cardStyles } from './shared-styles.js';
 
 class SquirrelPaymentView extends LitElement {
+  static styles = [
+    buttonBaseStyles,
+    cardStyles,
+    css`
+      :host {
+        display: block;
+      }
+
+      .payment-header {
+        text-align: center;
+        margin-bottom: 24px;
+      }
+
+      .payment-header-label {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 4px;
+      }
+
+      .payment-total-amount {
+        font-family: 'Fredoka One', cursive;
+        font-size: 3.5rem;
+        color: var(--red);
+        line-height: 1;
+      }
+
+      .payment-instruction {
+        font-size: 0.85rem;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+
+      .payment-order-summary {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+
+      .payment-order-tag {
+        background: white;
+        border: 1.5px solid var(--border);
+        border-radius: 20px;
+        padding: 5px 12px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--brown);
+      }
+
+      .payment-order-tag.donation {
+        border-color: var(--green);
+        color: var(--green);
+      }
+
+      .qr-grid {
+        display: flex;
+        gap: 14px;
+        margin-bottom: 24px;
+        justify-content: center;
+      }
+
+      .qr-panel {
+        flex: 1;
+        max-width: 180px;
+        background: white;
+        border: 2px solid var(--border);
+        border-radius: 16px;
+        padding: 16px 12px 14px;
+        text-align: center;
+      }
+
+      .qr-panel-label {
+        font-family: 'Fredoka One', cursive;
+        font-size: 1.15rem;
+        margin-bottom: 10px;
+      }
+
+      .qr-panel-label.venmo {
+        color: var(--venmo);
+      }
+      .qr-panel-label.paypal {
+        color: var(--paypal);
+      }
+
+      .qr-canvas-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .qr-canvas-wrap canvas,
+      .qr-canvas-wrap img {
+        max-width: 100%;
+        height: auto !important;
+        display: block;
+      }
+
+      .qr-warning {
+        font-size: 0.75rem;
+        color: var(--red);
+        padding: 8px 4px;
+      }
+
+      .qr-handle {
+        font-size: 0.72rem;
+        color: var(--muted);
+        margin-top: 8px;
+        word-break: break-all;
+      }
+
+      .payment-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .edit-order-btn {
+        flex: 1;
+        padding: 18px;
+        background: var(--brown);
+        color: white;
+        border-radius: 14px;
+        font-family: 'Fredoka One', cursive;
+        font-size: 1.25rem;
+        touch-action: manipulation;
+        transition: background 0.12s;
+      }
+
+      .edit-order-btn:active {
+        background: #1a0e08;
+      }
+
+      .new-order-btn {
+        flex: 1;
+        padding: 18px;
+        background: white;
+        color: var(--brown);
+        border: 2px solid var(--border);
+        border-radius: 14px;
+        font-family: 'Fredoka One', cursive;
+        font-size: 1.25rem;
+        touch-action: manipulation;
+        transition:
+          background 0.12s,
+          color 0.12s;
+      }
+
+      .new-order-btn:active {
+        background: var(--cream);
+      }
+
+      @media (max-width: 360px) {
+        .qr-panel {
+          padding: 12px 8px;
+        }
+      }
+    `,
+  ];
+
   static properties = {
     items: {},
     qty: {},
@@ -11,10 +174,6 @@ class SquirrelPaymentView extends LitElement {
     venmoUsername: {},
     paypalDonateUrl: {},
   };
-
-  createRenderRoot() {
-    return this;
-  }
 
   async updated() {
     await this._renderQRCodes();
@@ -34,7 +193,7 @@ class SquirrelPaymentView extends LitElement {
     const sharedOpts = { width: size, errorCorrectionLevel: 'M', margin: 1 };
 
     const renderQR = async (elId, color, text) => {
-      const el = this.querySelector(elId);
+      const el = this.renderRoot?.querySelector?.(elId);
       if (!el) return;
       const canvas = document.createElement('canvas');
       await QRCode.toCanvas(canvas, text, {
@@ -56,7 +215,7 @@ class SquirrelPaymentView extends LitElement {
   }
 
   _emit(type) {
-    this.dispatchEvent(new CustomEvent(type, { bubbles: true }));
+    this.dispatchEvent(new CustomEvent(type, { bubbles: true, composed: true }));
   }
 
   render() {

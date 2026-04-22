@@ -1,9 +1,39 @@
-import { LitElement, html } from 'lit';
+import { LitElement, css, html } from 'lit';
 import { CONFIG } from './config.js';
 import './components/order-view.js';
 import './components/payment-view.js';
 
 class SquirrelApp extends LitElement {
+  static styles = css`
+    :host {
+      display: block;
+    }
+
+    .header {
+      padding: 24px 16px 0;
+      text-align: center;
+    }
+
+    .header-logo {
+      width: 110px;
+      height: 110px;
+      margin: 0 auto 10px;
+      display: block;
+    }
+
+    .header-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .header-squirrel {
+      font-size: 3rem;
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+  `;
+
   static properties = {
     _qty: { state: true },
     _donation: { state: true },
@@ -17,10 +47,6 @@ class SquirrelApp extends LitElement {
     this._donation = '';
     this._view = 'order';
     this._logoFailed = false;
-  }
-
-  createRenderRoot() {
-    return this; // light DOM — styles.css applies normally
   }
 
   get _donationValue() {
