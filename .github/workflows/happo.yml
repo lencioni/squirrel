@@ -1,0 +1,35 @@
+name: Happo visual tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  happo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
+          fetch-depth: 100
+
+      - name: Fetch main branch
+        if: github.ref != 'refs/heads/main'
+        run: git fetch origin main:main
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install
+
+      - run: pnpm happo
+        env:
+          HAPPO_API_KEY: ${{ secrets.HAPPO_API_KEY }}
+          HAPPO_API_SECRET: ${{ secrets.HAPPO_API_SECRET }}
