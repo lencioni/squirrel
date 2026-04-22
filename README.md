@@ -27,8 +27,6 @@ Edit [`config.js`](config.js) to customize the app for your event:
 
 ## Deploying to GitHub Pages
 
-### First-time setup
-
 1. Build the app:
 
    ```sh
@@ -40,13 +38,5 @@ Edit [`config.js`](config.js) to customize the app for your event:
 2. Push `dist/` to the `gh-pages` branch:
 
    ```sh
-   pnpm dlx gh-pages -d dist
+   pnpm run deploy
    ```
-
-3. In your repository settings on GitHub, set Pages source to the `gh-pages` branch.
-
-### Subsequent deploys
-
-```sh
-pnpm build && pnpm dlx gh-pages -d dist
-```
