@@ -48,7 +48,7 @@ class SquirrelOrderView extends LitElement {
               <span class="order-row-name">${item.name}</span>
               <span class="order-row-meta">× ${this.qty[item.id]}</span>
             </div>
-            <span class="order-row-price">${fmt(this.qty[item.id] * item.price)}</span>
+            <span class="order-row-price">${fmt(this.qty[item.id] * item.price / 100)}</span>
           </div>
         `,
       )}
