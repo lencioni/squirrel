@@ -84,6 +84,10 @@ button {
 }
 
 /* ── Menu grid ── */
+squirrel-menu-item {
+  display: contents;
+}
+
 .menu-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
