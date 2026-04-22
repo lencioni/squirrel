@@ -1,8 +1,10 @@
-import { LitElement, css, html } from 'lit';
+import { LitElement, css, html, nothing } from 'lit';
 import { classMap } from 'lit/directives/class-map.js';
 import { fmt } from '../utils.js';
 
 class SquirrelMenuItem extends LitElement {
+  _prevQty;
+
   static styles = css`
     :host {
       display: block;
@@ -22,7 +24,7 @@ class SquirrelMenuItem extends LitElement {
       background: var(--white);
       border: 2px solid var(--border);
       border-radius: 16px;
-      padding: 14px 10px 12px;
+      padding: 14px 10px 58px;
       text-align: center;
       height: 100%;
       user-select: none;
@@ -51,29 +53,33 @@ class SquirrelMenuItem extends LitElement {
       line-height: 1;
     }
 
+    .menu-item-title-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 8px;
+    }
+
     .menu-item-name {
       font-weight: 800;
       font-size: 1rem;
-      display: block;
     }
 
     .menu-item-price {
       font-size: 0.78rem;
       color: var(--muted);
-      display: block;
-      margin-top: 2px;
     }
 
     .menu-item-badge {
       position: absolute;
-      top: -9px;
-      right: -9px;
+      top: -12px;
+      right: -12px;
       background: var(--red);
       color: white;
       border-radius: 50%;
-      width: 26px;
-      height: 26px;
-      font-size: 0.8rem;
+      width: 32px;
+      height: 32px;
+      font-size: 0.9rem;
       font-weight: 800;
       display: flex;
       align-items: center;
@@ -81,41 +87,82 @@ class SquirrelMenuItem extends LitElement {
       pointer-events: none;
     }
 
+    .menu-item-badge.bump {
+      animation: badge-bump 220ms cubic-bezier(0.22, 1.2, 0.36, 1);
+    }
+
+    @keyframes badge-bump {
+      0% {
+        transform: scale(1);
+      }
+      45% {
+        transform: scale(1.25);
+      }
+      75% {
+        transform: scale(0.96);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
     .menu-item-controls {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      margin-top: 10px;
+      gap: 0;
+      margin-top: 0;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+      border-radius: 0 0 14px 14px;
+      background: var(--border);
     }
 
     .qty-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: 2px solid var(--red);
-      background: white;
-      color: var(--red);
-      font-size: 1.3rem;
-      font-weight: 800;
+      flex: 1;
+      height: 50px;
+      border: none;
+      background: transparent;
+      color: var(--brown);
+      font-size: 1.4rem;
+      font-weight: 900;
       display: flex;
       align-items: center;
       justify-content: center;
       line-height: 1;
-      flex-shrink: 0;
       touch-action: manipulation;
     }
 
     .qty-btn:active {
+      background: rgba(255 255 255 / 0.16);
+    }
+
+    .qty-btn:focus {
+      outline: none;
+    }
+
+    .qty-btn:focus-visible {
+      /* Use an inset ring so it isn't clipped by the footer container */
+      box-shadow: inset 0 0 0 3px var(--focus-ring);
+    }
+
+    .qty-btn.plus {
+      border-left: 1px solid rgba(0 0 0 / 0.12);
+    }
+
+    .menu-item.has-qty .menu-item-controls {
       background: var(--red);
+    }
+
+    .menu-item.has-qty .qty-btn {
       color: white;
     }
 
-    .qty-value {
-      font-weight: 800;
-      font-size: 1.1rem;
-      min-width: 22px;
-      text-align: center;
+    .menu-item.has-qty .qty-btn.plus {
+      border-left-color: rgba(255 255 255 / 0.22);
     }
 
     @media (max-width: 360px) {
@@ -128,6 +175,7 @@ class SquirrelMenuItem extends LitElement {
   static properties = {
     item: {},
     qty: { type: Number },
+    _badgeBump: { state: true },
   };
 
   updated() {
@@ -140,6 +188,22 @@ class SquirrelMenuItem extends LitElement {
 
     this.setAttribute('role', 'group');
     this.setAttribute('aria-label', `${this.item.name}, ${price} each, quantity ${qty}`);
+
+    if (this.qty !== undefined && this.qty !== null) {
+      // Trigger a short bump animation whenever the displayed quantity changes.
+      // (Skip the initial render where there is no previous value.)
+      const prev = this._prevQty;
+      if (typeof prev === 'number' && prev !== qty) {
+        this._badgeBump = false;
+        requestAnimationFrame(() => {
+          this._badgeBump = true;
+          window.setTimeout(() => {
+            this._badgeBump = false;
+          }, 240);
+        });
+      }
+      this._prevQty = qty;
+    }
   }
 
   _dispatch(delta) {
@@ -154,51 +218,32 @@ class SquirrelMenuItem extends LitElement {
 
   render() {
     const { item, qty } = this;
-    return qty === 0
-      ? html`<div
-          class="menu-item"
-          role="button"
-          tabindex="0"
-          aria-label=${`${item.name}, ${fmt(item.price / 100)} each`}
-          @click=${() => this._dispatch(1)}
-          @keydown=${(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              this._dispatch(1);
-            }
-          }}
+    return html`<div class=${classMap({ 'menu-item': true, 'has-qty': qty > 0 })}>
+      <span class="menu-item-emoji">${item.emoji}</span>
+      <div class="menu-item-title-row">
+        <span class="menu-item-name">${item.name}</span>
+        <span class="menu-item-price">${fmt(item.price / 100)} each</span>
+      </div>
+      <div class="menu-item-controls">
+        <button
+          class="qty-btn minus"
+          @click=${() => this._dispatch(-1)}
         >
-          <span class="menu-item-emoji">${item.emoji}</span>
-          <span class="menu-item-name">${item.name}</span>
-          <span class="menu-item-price">${fmt(item.price / 100)} each</span>
-        </div>`
-      : html`<div class=${classMap({ 'menu-item': true, 'has-qty': true })}>
-          <span class="menu-item-emoji">${item.emoji}</span>
-          <span class="menu-item-name">${item.name}</span>
-          <span class="menu-item-price">${fmt(item.price / 100)} each</span>
-          <div class="menu-item-controls">
-            <button
-              class="qty-btn"
-              @click=${(e) => {
-                e.stopPropagation();
-                this._dispatch(-1);
-              }}
-            >
-              −
-            </button>
-            <span class="qty-value">${qty}</span>
-            <button
-              class="qty-btn"
-              @click=${(e) => {
-                e.stopPropagation();
-                this._dispatch(1);
-              }}
-            >
-              +
-            </button>
-          </div>
-          <div class="menu-item-badge">${qty}</div>
-        </div>`;
+          −
+        </button>
+        <button
+          class="qty-btn plus"
+          @click=${() => this._dispatch(1)}
+        >
+          +
+        </button>
+      </div>
+      ${qty > 0
+        ? html`<div class=${classMap({ 'menu-item-badge': true, bump: this._badgeBump })}>
+            ${qty}
+          </div>`
+        : nothing}
+    </div>`;
   }
 }
 
