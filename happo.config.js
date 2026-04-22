@@ -47,7 +47,7 @@ export default defineConfig({
       );
 
       fs.copyFileSync(
-        path.resolve(__dirname, 'logo.svg'),
+        path.resolve(__dirname, 'public/logo.svg'),
         path.join(outDir, 'logo.svg'),
       );
 
