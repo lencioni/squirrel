@@ -74,7 +74,7 @@ class SquirrelMenuItem extends LitElement {
       position: absolute;
       top: -12px;
       right: -12px;
-      background: var(--red);
+      background: var(--green);
       color: white;
       border-radius: 50%;
       width: 32px;
