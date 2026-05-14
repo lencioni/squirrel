@@ -229,10 +229,10 @@ class SquirrelPaymentView extends LitElement {
     const parts = this.items
       .filter((i) => this.qty[i.id] > 0)
       .map((i) => {
-        return `${this.qty[i.id]}x${i.name}`;
+        return `${this.qty[i.id]} x ${i.name}`;
       });
-    if (don > 0) parts.push(`+$${don.toFixed(2)}donation`);
-    const note = parts.join(',');
+    if (don > 0) parts.push(`$${don.toFixed(2)} donation`);
+    const note = parts.join(', ');
 
     const slide = Math.min(280, window.innerWidth * 0.72);
     const size = Math.floor(slide - 48);
@@ -254,7 +254,12 @@ class SquirrelPaymentView extends LitElement {
       renderQR(
         '#venmo-qr',
         '#008CFF',
-        `https://venmo.com/${this.venmoUsername}?txn=pay&amount=${amountStr}&note=${note}`,
+        `https://account.venmo.com/${this.venmoUsername}?txn=pay&amount=${amountStr}&note=${encodeURIComponent(
+          // There seems to be a bug on iOS where spaces in the note are not
+          // encoded correctly. This is a workaround to use non-breaking spaces
+          // instead.
+          note.replaceAll(' ', '\u00A0'),
+        )}`,
       ),
       renderQR(
         '#paypal-qr',
