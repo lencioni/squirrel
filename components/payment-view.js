@@ -240,7 +240,11 @@ class SquirrelPaymentView extends LitElement {
         '#008CFF',
         `https://venmo.com/${this.venmoUsername}?txn=pay&amount=${amountStr}&note=${note}`,
       ),
-      renderQR('#paypal-qr', '#003087', `${this.paypalDonateUrl}&amount=${amountStr}`),
+      renderQR(
+        '#paypal-qr',
+        '#003087',
+        `${this.paypalDonateUrl}&amount=${amountStr}`,
+      ),
     ]);
   }
 
@@ -255,40 +259,44 @@ class SquirrelPaymentView extends LitElement {
     return html`
       <div class="content">
         <div class="card">
-        <div class="payment-header">
-          <div class="payment-header-label">Total Due</div>
-          <div class="payment-total-amount">${fmt(this.total)}</div>
-          <div class="payment-instruction">Customer scans to pay</div>
-        </div>
-
-        <div class="payment-order-summary">
-          ${ordered.map(
-            (item) => html`
-              <span class="payment-order-tag">
-                <span>${item.emoji} ${this.qty[item.id]} × ${item.name}</span>
-                ${item.description
-                  ? html`<span class="payment-order-tag-desc">${item.description}</span>`
-                  : nothing}
-              </span>
-            `,
-          )}
-          ${don > 0
-            ? html`<span class="payment-order-tag donation">💚 Donation ${fmt(don)}</span>`
-            : nothing}
-        </div>
-
-        <div class="qr-grid">
-          <div class="qr-panel">
-            <div class="qr-panel-label venmo">Venmo</div>
-            <div class="qr-canvas-wrap" id="venmo-qr"></div>
-            <div class="qr-handle">@${this.venmoUsername}</div>
+          <div class="payment-header">
+            <div class="payment-header-label">Total Due</div>
+            <div class="payment-total-amount">${fmt(this.total)}</div>
+            <div class="payment-instruction">Customer scans to pay</div>
           </div>
-          <div class="qr-panel">
-            <div class="qr-panel-label paypal">PayPal</div>
-            <div class="qr-canvas-wrap" id="paypal-qr"></div>
-            <div class="qr-handle">paypal.com/donate</div>
+
+          <div class="payment-order-summary">
+            ${ordered.map(
+              (item) => html`
+                <span class="payment-order-tag">
+                  <span>${item.emoji} ${this.qty[item.id]} × ${item.name}</span>
+                  ${item.description
+                    ? html`<span class="payment-order-tag-desc"
+                        >${item.description}</span
+                      >`
+                    : nothing}
+                </span>
+              `,
+            )}
+            ${don > 0
+              ? html`<span class="payment-order-tag donation"
+                  >💚 Donation ${fmt(don)}</span
+                >`
+              : nothing}
           </div>
-        </div>
+
+          <div class="qr-grid">
+            <div class="qr-panel">
+              <div class="qr-panel-label venmo">Venmo</div>
+              <div class="qr-canvas-wrap" id="venmo-qr"></div>
+              <div class="qr-handle">@${this.venmoUsername}</div>
+            </div>
+            <div class="qr-panel">
+              <div class="qr-panel-label paypal">PayPal</div>
+              <div class="qr-canvas-wrap" id="paypal-qr"></div>
+              <div class="qr-handle">paypal.com/donate</div>
+            </div>
+          </div>
         </div>
       </div>
 

@@ -210,7 +210,10 @@ class SquirrelMenuItem extends LitElement {
 
     this.setAttribute('role', 'group');
     const desc = this.item.description ? `, ${this.item.description}` : '';
-    this.setAttribute('aria-label', `${this.item.name}${desc}, ${price}, quantity ${qty}`);
+    this.setAttribute(
+      'aria-label',
+      `${this.item.name}${desc}, ${price}, quantity ${qty}`,
+    );
 
     if (this.qty !== undefined && this.qty !== null) {
       // Trigger a short bump animation whenever the displayed quantity changes.
@@ -254,20 +257,20 @@ class SquirrelMenuItem extends LitElement {
       </div>
       <div class="menu-item-controls">
         <button
+          type="button"
           class="qty-btn minus"
           @click=${() => this._dispatch(-1)}
         >
           −
         </button>
-        <button
-          class="qty-btn plus"
-          @click=${() => this._dispatch(1)}
-        >
+        <button type="button" class="qty-btn plus" @click=${() => this._dispatch(1)}>
           +
         </button>
       </div>
       ${qty > 0
-        ? html`<div class=${classMap({ 'menu-item-badge': true, bump: this._badgeBump })}>
+        ? html`<div
+            class=${classMap({ 'menu-item-badge': true, bump: this._badgeBump })}
+          >
             ${qty}
           </div>`
         : nothing}
