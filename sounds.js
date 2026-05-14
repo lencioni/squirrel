@@ -13,23 +13,37 @@ function audioContext() {
 }
 
 /**
- * Web Audio on phone speakers often reads much quieter than on a laptop, while
- * the same peak levels are already fine on desktop. Boost only for typical
- * touch-first devices (coarse pointer, no hover).
+ * iOS Safari often reports `pointer: fine`, so `(pointer: coarse)` alone never
+ * applies a phone boost. Combine UA / touch heuristics with pointer media.
  */
-function touchSpeakerBoost() {
-  if (typeof matchMedia === 'undefined') return 1;
+function likelyHandheldSpeaker() {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent || '';
+
+  if (/iPhone|iPod/i.test(ua)) return true;
+  if (/iPad/i.test(ua)) return true;
+  if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) {
+    return true; // iPadOS reporting as Mac
+  }
+  if (/Android/i.test(ua) && /Mobile/i.test(ua)) return true;
+
+  if (typeof matchMedia === 'undefined') return false;
   try {
     if (
       matchMedia('(pointer: coarse)').matches &&
       matchMedia('(hover: none)').matches
     ) {
-      return 2.35;
+      return true;
     }
   } catch {
     // ignore
   }
-  return 1;
+  return false;
+}
+
+/** Extra gain on phone / handheld speakers (see likelyHandheldSpeaker). */
+function touchSpeakerBoost() {
+  return likelyHandheldSpeaker() ? 4.75 : 1;
 }
 
 /**
@@ -37,7 +51,7 @@ function touchSpeakerBoost() {
  */
 function createSpeakerBus(ac) {
   const bus = ac.createGain();
-  bus.gain.value = Math.min(3, touchSpeakerBoost());
+  bus.gain.value = Math.min(6, touchSpeakerBoost());
   bus.connect(ac.destination);
   return bus;
 }
