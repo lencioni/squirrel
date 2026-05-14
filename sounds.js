@@ -12,46 +12,15 @@ function audioContext() {
   return _ctx;
 }
 
-/**
- * iOS Safari often reports `pointer: fine`, so `(pointer: coarse)` alone never
- * applies a phone boost. Combine UA / touch heuristics with pointer media.
- */
-function likelyHandheldSpeaker() {
-  if (typeof navigator === 'undefined') return false;
-  const ua = navigator.userAgent || '';
-
-  if (/iPhone|iPod/i.test(ua)) return true;
-  if (/iPad/i.test(ua)) return true;
-  if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) {
-    return true; // iPadOS reporting as Mac
-  }
-  if (/Android/i.test(ua) && /Mobile/i.test(ua)) return true;
-
-  if (typeof matchMedia === 'undefined') return false;
-  try {
-    if (
-      matchMedia('(pointer: coarse)').matches &&
-      matchMedia('(hover: none)').matches
-    ) {
-      return true;
-    }
-  } catch {
-    // ignore
-  }
-  return false;
-}
-
-/** Extra gain on phone / handheld speakers (see likelyHandheldSpeaker). */
-function touchSpeakerBoost() {
-  return likelyHandheldSpeaker() ? 4.75 : 1;
-}
+/** Linear gain on the master bus for all devices */
+const OUTPUT_BUS_GAIN = 8;
 
 /**
  * @param {AudioContext} ac
  */
 function createSpeakerBus(ac) {
   const bus = ac.createGain();
-  bus.gain.value = Math.min(6, touchSpeakerBoost());
+  bus.gain.value = OUTPUT_BUS_GAIN;
   bus.connect(ac.destination);
   return bus;
 }
@@ -101,9 +70,9 @@ export function playOrderPop() {
     osc.frequency.setValueAtTime(800, t0);
     osc.frequency.exponentialRampToValueAtTime(5, t0 + dur);
 
-    g.gain.setValueAtTime(0, t0);
-    g.gain.linearRampToValueAtTime(0.1, t0 + 0.004);
-    g.gain.exponentialRampToValueAtTime(0.000008, t0 + dur);
+    g.gain.setValueAtTime(0.00001, t0);
+    g.gain.linearRampToValueAtTime(0.2, t0 + 0.004);
+    g.gain.exponentialRampToValueAtTime(0.00001, t0 + dur);
 
     osc.connect(g);
     g.connect(bus);
@@ -130,7 +99,7 @@ export function playCashRegister() {
       osc.frequency.setValueAtTime(95, t0);
       osc.frequency.exponentialRampToValueAtTime(55, t0 + 0.05);
       g.gain.setValueAtTime(0, t0);
-      g.gain.linearRampToValueAtTime(0.22, t0 + 0.003);
+      g.gain.linearRampToValueAtTime(0.17, t0 + 0.003);
       g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.09);
       osc.connect(g);
       g.connect(bus);
@@ -152,9 +121,9 @@ export function playCashRegister() {
       osc.stop(start + 0.16);
     };
 
-    ding(t0 + 0.045, 1318, 0.09);
-    ding(t0 + 0.095, 1760, 0.08);
-    ding(t0 + 0.155, 2093, 0.07);
+    ding(t0 + 0.045, 1318, 0.12);
+    ding(t0 + 0.095, 1760, 0.11);
+    ding(t0 + 0.155, 2093, 0.1);
   });
 }
 
@@ -182,7 +151,7 @@ export function playNewOrder() {
       osc.stop(t + 0.13);
     };
 
-    blip(t0, 523, 0.06);
-    blip(t0 + 0.07, 784, 0.05);
+    blip(t0, 523, 0.1);
+    blip(t0 + 0.07, 784, 0.09);
   });
 }
