@@ -86,8 +86,31 @@ class SquirrelOrderView extends LitElement {
 
       .order-row-left {
         display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 0;
+      }
+
+      .order-row-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+        flex: 1;
+      }
+
+      .order-row-name-line {
+        display: flex;
         align-items: baseline;
+        flex-wrap: wrap;
         gap: 4px;
+      }
+
+      .order-row-desc {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--muted);
+        line-height: 1.2;
       }
 
       .order-row-emoji {
@@ -336,8 +359,15 @@ class SquirrelOrderView extends LitElement {
           <div class="order-row">
             <div class="order-row-left">
               <span class="order-row-emoji">${item.emoji}</span>
-              <span class="order-row-name">${item.name}</span>
-              <span class="order-row-meta">× ${this.qty[item.id]}</span>
+              <div class="order-row-text">
+                <div class="order-row-name-line">
+                  <span class="order-row-name">${item.name}</span>
+                  <span class="order-row-meta">× ${this.qty[item.id]}</span>
+                </div>
+                ${item.description
+                  ? html`<span class="order-row-desc">${item.description}</span>`
+                  : nothing}
+              </div>
             </div>
             <span class="order-row-price">${fmt(this.qty[item.id] * item.price / 100)}</span>
           </div>

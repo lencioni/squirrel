@@ -9,10 +9,16 @@ export const CONFIG = {
   // Menu items
   // price is in cents (e.g. 50 = $0.50, 500 = $5.00)
   items: [
-    { id: 'brat', name: 'Brat', price: 500, emoji: '🌭' },
-    { id: 'pop', name: 'Pop', price: 200, emoji: '🥤' },
-    { id: 'water', name: 'Water', price: 100, emoji: '💧' },
-    { id: 'treat', name: 'Treat', price: 300, emoji: '🍪' },
+    {
+      id: 'meal',
+      name: 'Meal deal',
+      description: 'Dog & chips',
+      price: 500,
+      emoji: '🌭',
+    },
+    { id: 'treats', name: 'Treats', price: 100, emoji: '🍪' },
+    { id: 'chips', name: 'Chips', price: 100, emoji: '🍟' },
+    { id: 'beverages', name: 'Beverages', price: 100, emoji: '🥤' },
   ],
 
   // Quick-add donation button amounts (in whole dollars)
