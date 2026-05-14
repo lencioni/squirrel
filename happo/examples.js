@@ -21,7 +21,10 @@ const examples = [
     component: 'SquirrelApp',
     tag: 'squirrel-app',
     variant: 'Order screen - with donation',
-    props: { _qty: { meal: 1, treats: 0, chips: 0, beverages: 0 }, _donation: '2.00' },
+    props: {
+      _qty: { meal: 1, treats: 0, chips: 0, beverages: 0 },
+      _donation: '2.00',
+    },
   },
 
   // SquirrelMenuItem

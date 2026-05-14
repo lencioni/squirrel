@@ -2,7 +2,11 @@ import { LitElement, css, html, nothing } from 'lit';
 import { classMap } from 'lit/directives/class-map.js';
 import { live } from 'lit/directives/live.js';
 import { fmt } from '../utils.js';
-import { buttonBaseStyles, cardStyles, sectionLabelStyles } from './shared-styles.js';
+import {
+  buttonBaseStyles,
+  cardStyles,
+  sectionLabelStyles,
+} from './shared-styles.js';
 import './menu-item.js';
 
 class SquirrelOrderView extends LitElement {
@@ -324,7 +328,9 @@ class SquirrelOrderView extends LitElement {
   }
 
   _emit(type, detail) {
-    this.dispatchEvent(new CustomEvent(type, { bubbles: true, composed: true, detail }));
+    this.dispatchEvent(
+      new CustomEvent(type, { bubbles: true, composed: true, detail }),
+    );
   }
 
   _formatDonationString(raw) {
@@ -369,7 +375,9 @@ class SquirrelOrderView extends LitElement {
                   : nothing}
               </div>
             </div>
-            <span class="order-row-price">${fmt(this.qty[item.id] * item.price / 100)}</span>
+            <span class="order-row-price"
+              >${fmt((this.qty[item.id] * item.price) / 100)}</span
+            >
           </div>
         `,
       )}
@@ -412,7 +420,10 @@ class SquirrelOrderView extends LitElement {
           <p class="section-label">💚 Add a Donation</p>
           <div class="donation-section">
             <div
-              class=${classMap({ 'donation-controls': true, 'has-donation': this._donationValue > 0 })}
+              class=${classMap({
+                'donation-controls': true,
+                'has-donation': this._donationValue > 0,
+              })}
             >
               <div class="donation-input-row">
                 <div class="donation-input-wrap">
@@ -425,7 +436,8 @@ class SquirrelOrderView extends LitElement {
                     min="0"
                     step="1.00"
                     .value=${live(this.donation)}
-                    @input=${(e) => this._emit('donation-change', { value: e.target.value })}
+                    @input=${(e) =>
+                      this._emit('donation-change', { value: e.target.value })}
                     @change=${(e) =>
                       this._emit('donation-change', {
                         value: this._formatDonationString(e.target.value),
@@ -448,14 +460,18 @@ class SquirrelOrderView extends LitElement {
                   (amt) => html`
                     <button
                       class="donation-quick-btn"
-                      @click=${() => this._emit('quick-donation-add', { amount: amt })}
+                      @click=${() =>
+                        this._emit('quick-donation-add', { amount: amt })}
                     >
                       +$${amt}
                     </button>
                   `,
                 )}
                 ${showRoundUp
-                  ? html`<button class="donation-quick-btn" @click=${() => this._emit('round-up')}>
+                  ? html`<button
+                      class="donation-quick-btn"
+                      @click=${() => this._emit('round-up')}
+                    >
                       Round Up
                     </button>`
                   : nothing}
@@ -464,7 +480,12 @@ class SquirrelOrderView extends LitElement {
           </div>
 
           <p class="section-label">Order</p>
-          <div class=${classMap({ 'order-summary': true, 'has-total': this._total > 0 })}>
+          <div
+            class=${classMap({
+              'order-summary': true,
+              'has-total': this._total > 0,
+            })}
+          >
             ${this._renderOrderSummary()}
           </div>
         </div>
