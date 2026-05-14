@@ -110,6 +110,15 @@ class SquirrelPaymentView extends LitElement {
         display: none;
       }
 
+      .qr-scroll:focus {
+        outline: none;
+      }
+
+      .qr-scroll:focus-visible {
+        outline: 3px solid var(--focus-ring);
+        outline-offset: 2px;
+      }
+
       .qr-panel {
         flex: 0 0 var(--qr-slide);
         scroll-snap-align: center;
@@ -290,6 +299,7 @@ class SquirrelPaymentView extends LitElement {
           <div
             class="qr-scroll"
             role="region"
+            tabindex="0"
             aria-label="Payment QR codes, swipe to switch between Venmo and PayPal"
           >
             <div class="qr-panel">
