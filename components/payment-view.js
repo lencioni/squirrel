@@ -83,14 +83,6 @@ class SquirrelPaymentView extends LitElement {
         color: var(--brown);
       }
 
-      .payment-order-tag-desc {
-        font-size: 0.68rem;
-        font-weight: 600;
-        color: var(--muted);
-        line-height: 1.2;
-        max-width: 100%;
-      }
-
       .payment-order-tag.donation {
         border-color: var(--green);
         color: var(--green);
@@ -212,8 +204,7 @@ class SquirrelPaymentView extends LitElement {
     const parts = this.items
       .filter((i) => this.qty[i.id] > 0)
       .map((i) => {
-        const label = i.description ? `${i.name} (${i.description})` : i.name;
-        return `${this.qty[i.id]}x${label}`;
+        return `${this.qty[i.id]}x${i.name}`;
       });
     if (don > 0) parts.push(`+$${don.toFixed(2)}donation`);
     const note = parts.join(',');
@@ -270,11 +261,6 @@ class SquirrelPaymentView extends LitElement {
               (item) => html`
                 <span class="payment-order-tag">
                   <span>${item.emoji} ${this.qty[item.id]} × ${item.name}</span>
-                  ${item.description
-                    ? html`<span class="payment-order-tag-desc"
-                        >${item.description}</span
-                      >`
-                    : nothing}
                 </span>
               `,
             )}
