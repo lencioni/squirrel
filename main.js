@@ -1,5 +1,6 @@
 import { LitElement, css, html } from 'lit';
 import { CONFIG } from './config.js';
+import { playCashRegister, playNewOrder, playOrderPop } from './sounds.js';
 import './components/order-view.js';
 import './components/payment-view.js';
 
@@ -78,10 +79,16 @@ class SquirrelApp extends LitElement {
   }
 
   _changeQty(id, delta) {
-    this._qty = { ...this._qty, [id]: Math.max(0, this._qty[id] + delta) };
+    const prev = this._qty[id] ?? 0;
+    const next = Math.max(0, prev + delta);
+    if (next !== prev) {
+      playOrderPop();
+    }
+    this._qty = { ...this._qty, [id]: next };
   }
 
   _addQuickDonation(amount) {
+    playOrderPop();
     const current = parseFloat(this._donation) || 0;
     this._donation = (current + amount).toFixed(2);
   }
@@ -92,12 +99,16 @@ class SquirrelApp extends LitElement {
       Math.ceil(this._subtotal + this._donationValue) -
       this._subtotal -
       this._donationValue;
-    if (needed > 0) this._donation = (this._donationValue + needed).toFixed(2);
+    if (needed > 0) {
+      playOrderPop();
+      this._donation = (this._donationValue + needed).toFixed(2);
+    }
   }
 
   _showPayment() {
     history.pushState({ view: 'payment' }, '', window.location.href);
     this._view = 'payment';
+    playCashRegister();
   }
 
   _editOrder() {
@@ -105,6 +116,7 @@ class SquirrelApp extends LitElement {
   }
 
   _newOrder() {
+    playNewOrder();
     this._qty = Object.fromEntries(CONFIG.items.map((i) => [i.id, 0]));
     this._donation = '';
     history.replaceState({ view: 'order' }, '', window.location.href);
@@ -135,6 +147,7 @@ class SquirrelApp extends LitElement {
             @qty-change=${(e) => this._changeQty(e.detail.id, e.detail.delta)}
             @donation-change=${(e) => {
               this._donation = e.detail.value;
+              if (e.detail.sound) playOrderPop();
             }}
             @quick-donation-add=${(e) => this._addQuickDonation(e.detail.amount)}
             @round-up=${this._roundUp}
