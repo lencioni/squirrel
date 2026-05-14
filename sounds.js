@@ -13,7 +13,7 @@ function audioContext() {
 }
 
 /** Linear gain on the master bus for all devices */
-const OUTPUT_BUS_GAIN = 8;
+const OUTPUT_BUS_GAIN = 1;
 
 /**
  * @param {AudioContext} ac
@@ -61,18 +61,18 @@ export function playOrderPop() {
     const ac = audioContext();
     if (!ac) return;
     const t0 = anchorTime(ac, resumeRequested);
-    const dur = 0.015;
+    const dur = 0.08;
 
     const bus = createSpeakerBus(ac);
     const osc = ac.createOscillator();
     const g = ac.createGain();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(800, t0);
+    osc.frequency.setValueAtTime(600, t0);
     osc.frequency.exponentialRampToValueAtTime(5, t0 + dur);
 
-    g.gain.setValueAtTime(0.00001, t0);
-    g.gain.linearRampToValueAtTime(0.2, t0 + 0.004);
-    g.gain.exponentialRampToValueAtTime(0.00001, t0 + dur);
+    g.gain.setValueAtTime(0, t0);
+    g.gain.linearRampToValueAtTime(1, t0 + 0.004);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
 
     osc.connect(g);
     g.connect(bus);
@@ -121,9 +121,9 @@ export function playCashRegister() {
       osc.stop(start + 0.16);
     };
 
-    ding(t0 + 0.045, 1318, 0.12);
-    ding(t0 + 0.095, 1760, 0.11);
-    ding(t0 + 0.155, 2093, 0.1);
+    ding(t0 + 0.045, 1318, 1);
+    ding(t0 + 0.095, 1760, 0.8);
+    ding(t0 + 0.155, 2093, 0.6);
   });
 }
 
@@ -151,7 +151,7 @@ export function playNewOrder() {
       osc.stop(t + 0.13);
     };
 
-    blip(t0, 523, 0.1);
-    blip(t0 + 0.07, 784, 0.09);
+    blip(t0, 523, 0.8);
+    blip(t0 + 0.07, 784, 0.6);
   });
 }
