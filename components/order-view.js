@@ -452,7 +452,7 @@ class SquirrelOrderView extends LitElement {
               <div class="donation-quick-row">
                 <button
                   class="donation-quick-btn"
-                  @click=${() => this._emit('donation-change', { value: '' })}
+                  @click=${() => this._emit('donation-change', { value: '', sound: true })}
                 >
                   Clear
                 </button>
