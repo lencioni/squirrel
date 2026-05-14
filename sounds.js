@@ -3,30 +3,51 @@ let _ctx;
 
 function audioContext() {
   if (!_ctx) {
-    _ctx = new AudioContext();
+    const Ctor =
+      typeof window !== 'undefined' &&
+      (window.AudioContext ?? window.webkitAudioContext);
+    if (!Ctor) return undefined;
+    _ctx = new Ctor();
   }
   return _ctx;
 }
 
 /**
- * @param {() => void} fn
+ * When we call `resume()` the context is still `suspended` for the rest of this
+ * turn. Scheduling at `currentTime` can end up strictly in the past the moment
+ * Chrome starts the clock, so those nodes never run. Nudge into the near future
+ * only in that case (imperceptible delay when already running: nudge is off).
+ *
+ * @param {AudioContext} ac
+ * @param {boolean} resumeRequested
+ */
+function anchorTime(ac, resumeRequested) {
+  return ac.currentTime + (resumeRequested ? 0.02 : 0);
+}
+
+/**
+ * @param {(resumeRequested: boolean) => void} fn
  */
 function whenRunning(fn) {
   const ac = audioContext();
-  if (ac.state === 'running') {
-    fn();
-    return;
-  }
-  void ac.resume().then(fn);
+  if (!ac) return;
+
+  // iOS Safari only unlocks output from a user gesture’s *synchronous* stack.
+  // If we schedule nodes inside `resume().then(...)`, that runs after the tap
+  // finishes and the context stays effectively muted.
+  const resumeRequested = ac.state !== 'running';
+  if (resumeRequested) void ac.resume();
+  fn(resumeRequested);
 }
 
 /**
  * Short percussive “pop” for order +/- taps.
  */
 export function playOrderPop() {
-  whenRunning(() => {
+  whenRunning((resumeRequested) => {
     const ac = audioContext();
-    const t0 = ac.currentTime;
+    if (!ac) return;
+    const t0 = anchorTime(ac, resumeRequested);
     const dur = 0.015;
 
     const osc = ac.createOscillator();
@@ -50,9 +71,10 @@ export function playOrderPop() {
  * Stylized “ka-ching” when the payment QR screen appears.
  */
 export function playCashRegister() {
-  whenRunning(() => {
+  whenRunning((resumeRequested) => {
     const ac = audioContext();
-    const t0 = ac.currentTime;
+    if (!ac) return;
+    const t0 = anchorTime(ac, resumeRequested);
 
     // Drawer / thunk: quick low sine
     {
@@ -94,9 +116,10 @@ export function playCashRegister() {
  * Upward two-note chime when starting a new order from the payment screen.
  */
 export function playNewOrder() {
-  whenRunning(() => {
+  whenRunning((resumeRequested) => {
     const ac = audioContext();
-    const t0 = ac.currentTime;
+    if (!ac) return;
+    const t0 = anchorTime(ac, resumeRequested);
 
     const blip = (t, freq, vol) => {
       const osc = ac.createOscillator();
