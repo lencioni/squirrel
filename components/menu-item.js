@@ -55,19 +55,41 @@ class SquirrelMenuItem extends LitElement {
 
     .menu-item-title-row {
       display: flex;
-      align-items: baseline;
-      justify-content: center;
-      gap: 8px;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 0 2px;
+      text-align: left;
+    }
+
+    .menu-item-text {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
     .menu-item-name {
       font-weight: 800;
       font-size: 1rem;
+      line-height: 1.2;
+    }
+
+    .menu-item-desc {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      line-height: 1.25;
     }
 
     .menu-item-price {
+      flex-shrink: 0;
       font-size: 0.78rem;
       color: var(--muted);
+      white-space: nowrap;
+      line-height: 1.2;
+      padding-top: 1px;
     }
 
     .menu-item-badge {
@@ -187,7 +209,8 @@ class SquirrelMenuItem extends LitElement {
     const price = fmt(this.item.price / 100);
 
     this.setAttribute('role', 'group');
-    this.setAttribute('aria-label', `${this.item.name}, ${price} each, quantity ${qty}`);
+    const desc = this.item.description ? `, ${this.item.description}` : '';
+    this.setAttribute('aria-label', `${this.item.name}${desc}, ${price}, quantity ${qty}`);
 
     if (this.qty !== undefined && this.qty !== null) {
       // Trigger a short bump animation whenever the displayed quantity changes.
@@ -221,8 +244,13 @@ class SquirrelMenuItem extends LitElement {
     return html`<div class=${classMap({ 'menu-item': true, 'has-qty': qty > 0 })}>
       <span class="menu-item-emoji">${item.emoji}</span>
       <div class="menu-item-title-row">
-        <span class="menu-item-name">${item.name}</span>
-        <span class="menu-item-price">${fmt(item.price / 100)} each</span>
+        <div class="menu-item-text">
+          <span class="menu-item-name">${item.name}</span>
+          ${item.description
+            ? html`<span class="menu-item-desc">${item.description}</span>`
+            : nothing}
+        </div>
+        <span class="menu-item-price">${fmt(item.price / 100)}</span>
       </div>
       <div class="menu-item-controls">
         <button

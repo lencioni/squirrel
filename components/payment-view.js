@@ -70,6 +70,10 @@ class SquirrelPaymentView extends LitElement {
       }
 
       .payment-order-tag {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
         background: white;
         border: 1.5px solid var(--border);
         border-radius: 20px;
@@ -77,6 +81,14 @@ class SquirrelPaymentView extends LitElement {
         font-size: 0.85rem;
         font-weight: 700;
         color: var(--brown);
+      }
+
+      .payment-order-tag-desc {
+        font-size: 0.68rem;
+        font-weight: 600;
+        color: var(--muted);
+        line-height: 1.2;
+        max-width: 100%;
       }
 
       .payment-order-tag.donation {
@@ -199,7 +211,10 @@ class SquirrelPaymentView extends LitElement {
     const don = this.donationValue;
     const parts = this.items
       .filter((i) => this.qty[i.id] > 0)
-      .map((i) => `${this.qty[i.id]}x${i.name}`);
+      .map((i) => {
+        const label = i.description ? `${i.name} (${i.description})` : i.name;
+        return `${this.qty[i.id]}x${label}`;
+      });
     if (don > 0) parts.push(`+$${don.toFixed(2)}donation`);
     const note = parts.join(',');
 
@@ -250,7 +265,10 @@ class SquirrelPaymentView extends LitElement {
           ${ordered.map(
             (item) => html`
               <span class="payment-order-tag">
-                ${item.emoji} ${this.qty[item.id]} × ${item.name}
+                <span>${item.emoji} ${this.qty[item.id]} × ${item.name}</span>
+                ${item.description
+                  ? html`<span class="payment-order-tag-desc">${item.description}</span>`
+                  : nothing}
               </span>
             `,
           )}

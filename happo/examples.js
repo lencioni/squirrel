@@ -15,13 +15,13 @@ const examples = [
     component: 'SquirrelApp',
     tag: 'squirrel-app',
     variant: 'Order screen - with items',
-    props: { _qty: { brat: 2, pop: 1, water: 0, treat: 1 } },
+    props: { _qty: { meal: 2, treats: 1, chips: 0, beverages: 1 } },
   },
   {
     component: 'SquirrelApp',
     tag: 'squirrel-app',
     variant: 'Order screen - with donation',
-    props: { _qty: { brat: 1, pop: 0, water: 0, treat: 0 }, _donation: '2.00' },
+    props: { _qty: { meal: 1, treats: 0, chips: 0, beverages: 0 }, _donation: '2.00' },
   },
 
   // SquirrelMenuItem
@@ -56,7 +56,7 @@ const examples = [
     variant: 'with items',
     props: {
       items: CONFIG.items,
-      qty: { brat: 2, pop: 1, water: 0, treat: 1 },
+      qty: { meal: 2, treats: 1, chips: 0, beverages: 1 },
       donation: '',
       quickDonations: CONFIG.quickDonations,
     },
@@ -67,7 +67,7 @@ const examples = [
     variant: 'with donation',
     props: {
       items: CONFIG.items,
-      qty: { brat: 1, pop: 0, water: 0, treat: 0 },
+      qty: { meal: 1, treats: 0, chips: 0, beverages: 0 },
       donation: '2.00',
       quickDonations: CONFIG.quickDonations,
     },
@@ -80,7 +80,7 @@ const examples = [
     variant: 'with items',
     props: {
       items: CONFIG.items,
-      qty: { brat: 2, pop: 1, water: 0, treat: 1 },
+      qty: { meal: 2, treats: 1, chips: 0, beverages: 1 },
       donationValue: 0,
       total: 12.0,
       venmoUsername: CONFIG.venmoUsername,
@@ -93,7 +93,7 @@ const examples = [
     variant: 'with items and donation',
     props: {
       items: CONFIG.items,
-      qty: { brat: 1, pop: 0, water: 0, treat: 0 },
+      qty: { meal: 1, treats: 0, chips: 0, beverages: 0 },
       donationValue: 2.0,
       total: 7.0,
       venmoUsername: CONFIG.venmoUsername,
