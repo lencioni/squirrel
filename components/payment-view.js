@@ -88,16 +88,32 @@ class SquirrelPaymentView extends LitElement {
         color: var(--green);
       }
 
-      .qr-grid {
+      /* Horizontal snap carousel: one QR centered on screen, sibling peeks at edge (phone). */
+      .qr-scroll {
         display: flex;
         gap: 14px;
+        margin-inline: -16px;
         margin-bottom: 24px;
-        justify-content: center;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-x;
+        scrollbar-width: none;
+        /* Slide ~72vw so neighbor peeks; pad to snap first/last to viewport center */
+        --qr-slide: min(280px, 72vw);
+        scroll-padding-inline: max(0px, calc(50vw - var(--qr-slide) / 2));
+        padding-inline: max(0px, calc(50vw - var(--qr-slide) / 2));
+      }
+
+      .qr-scroll::-webkit-scrollbar {
+        display: none;
       }
 
       .qr-panel {
-        flex: 1;
-        max-width: 180px;
+        flex: 0 0 var(--qr-slide);
+        scroll-snap-align: center;
+        scroll-snap-stop: always;
         background: white;
         border: 2px solid var(--border);
         border-radius: 16px;
@@ -209,8 +225,8 @@ class SquirrelPaymentView extends LitElement {
     if (don > 0) parts.push(`+$${don.toFixed(2)}donation`);
     const note = parts.join(',');
 
-    const panelWidth = Math.min(180, (window.innerWidth - 32 - 14) / 2);
-    const size = Math.floor(panelWidth - 28);
+    const slide = Math.min(280, window.innerWidth * 0.72);
+    const size = Math.floor(slide - 48);
     const sharedOpts = { width: size, errorCorrectionLevel: 'M', margin: 1 };
 
     const renderQR = async (elId, color, text) => {
@@ -271,7 +287,11 @@ class SquirrelPaymentView extends LitElement {
               : nothing}
           </div>
 
-          <div class="qr-grid">
+          <div
+            class="qr-scroll"
+            role="region"
+            aria-label="Payment QR codes, swipe to switch between Venmo and PayPal"
+          >
             <div class="qr-panel">
               <div class="qr-panel-label venmo">Venmo</div>
               <div class="qr-canvas-wrap" id="venmo-qr"></div>
