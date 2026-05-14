@@ -13,6 +13,36 @@ function audioContext() {
 }
 
 /**
+ * Web Audio on phone speakers often reads much quieter than on a laptop, while
+ * the same peak levels are already fine on desktop. Boost only for typical
+ * touch-first devices (coarse pointer, no hover).
+ */
+function touchSpeakerBoost() {
+  if (typeof matchMedia === 'undefined') return 1;
+  try {
+    if (
+      matchMedia('(pointer: coarse)').matches &&
+      matchMedia('(hover: none)').matches
+    ) {
+      return 2.35;
+    }
+  } catch {
+    // ignore
+  }
+  return 1;
+}
+
+/**
+ * @param {AudioContext} ac
+ */
+function createSpeakerBus(ac) {
+  const bus = ac.createGain();
+  bus.gain.value = Math.min(3, touchSpeakerBoost());
+  bus.connect(ac.destination);
+  return bus;
+}
+
+/**
  * When we call `resume()` the context is still `suspended` for the rest of this
  * turn. Scheduling at `currentTime` can end up strictly in the past the moment
  * Chrome starts the clock, so those nodes never run. Nudge into the near future
@@ -50,6 +80,7 @@ export function playOrderPop() {
     const t0 = anchorTime(ac, resumeRequested);
     const dur = 0.015;
 
+    const bus = createSpeakerBus(ac);
     const osc = ac.createOscillator();
     const g = ac.createGain();
     osc.type = 'sine';
@@ -61,7 +92,7 @@ export function playOrderPop() {
     g.gain.exponentialRampToValueAtTime(0.000008, t0 + dur);
 
     osc.connect(g);
-    g.connect(ac.destination);
+    g.connect(bus);
     osc.start(t0);
     osc.stop(t0 + dur + 0.02);
   });
@@ -75,6 +106,7 @@ export function playCashRegister() {
     const ac = audioContext();
     if (!ac) return;
     const t0 = anchorTime(ac, resumeRequested);
+    const bus = createSpeakerBus(ac);
 
     // Drawer / thunk: quick low sine
     {
@@ -87,7 +119,7 @@ export function playCashRegister() {
       g.gain.linearRampToValueAtTime(0.22, t0 + 0.003);
       g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.09);
       osc.connect(g);
-      g.connect(ac.destination);
+      g.connect(bus);
       osc.start(t0);
       osc.stop(t0 + 0.1);
     }
@@ -101,7 +133,7 @@ export function playCashRegister() {
       g.gain.linearRampToValueAtTime(vol, start + 0.002);
       g.gain.exponentialRampToValueAtTime(0.0008, start + 0.14);
       osc.connect(g);
-      g.connect(ac.destination);
+      g.connect(bus);
       osc.start(start);
       osc.stop(start + 0.16);
     };
@@ -120,6 +152,7 @@ export function playNewOrder() {
     const ac = audioContext();
     if (!ac) return;
     const t0 = anchorTime(ac, resumeRequested);
+    const bus = createSpeakerBus(ac);
 
     const blip = (t, freq, vol) => {
       const osc = ac.createOscillator();
@@ -130,7 +163,7 @@ export function playNewOrder() {
       g.gain.linearRampToValueAtTime(vol, t + 0.003);
       g.gain.exponentialRampToValueAtTime(0.0008, t + 0.11);
       osc.connect(g);
-      g.connect(ac.destination);
+      g.connect(bus);
       osc.start(t);
       osc.stop(t + 0.13);
     };
