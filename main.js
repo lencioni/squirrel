@@ -47,6 +47,21 @@ class SquirrelApp extends LitElement {
     this._donation = '';
     this._view = 'order';
     this._logoFailed = false;
+    this._onPopState = this._onPopState.bind(this);
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    window.addEventListener('popstate', this._onPopState);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener('popstate', this._onPopState);
+  }
+
+  _onPopState(event) {
+    this._view = event.state?.view === 'payment' ? 'payment' : 'order';
   }
 
   get _donationValue() {
@@ -81,16 +96,18 @@ class SquirrelApp extends LitElement {
   }
 
   _showPayment() {
+    history.pushState({ view: 'payment' }, '', window.location.href);
     this._view = 'payment';
   }
 
   _editOrder() {
-    this._view = 'order';
+    history.back();
   }
 
   _newOrder() {
     this._qty = Object.fromEntries(CONFIG.items.map((i) => [i.id, 0]));
     this._donation = '';
+    history.replaceState({ view: 'order' }, '', window.location.href);
     this._view = 'order';
   }
 
