@@ -87,7 +87,6 @@ const examples = [
       donationValue: 0,
       total: 12.0,
       venmoUsername: CONFIG.venmoUsername,
-      paypalDonateUrl: CONFIG.paypalDonateUrl,
     },
   },
   {
@@ -100,7 +99,6 @@ const examples = [
       donationValue: 2.0,
       total: 7.0,
       venmoUsername: CONFIG.venmoUsername,
-      paypalDonateUrl: CONFIG.paypalDonateUrl,
     },
   },
 ];

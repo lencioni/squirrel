@@ -159,7 +159,6 @@ class SquirrelApp extends LitElement {
             .donationValue=${this._donationValue}
             .total=${this._total}
             .venmoUsername=${CONFIG.venmoUsername}
-            .paypalDonateUrl=${CONFIG.paypalDonateUrl}
             @edit-order=${this._editOrder}
             @new-order=${this._newOrder}
           ></squirrel-payment-view>`}
