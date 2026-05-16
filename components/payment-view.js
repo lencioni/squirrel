@@ -88,41 +88,15 @@ class SquirrelPaymentView extends LitElement {
         color: var(--green);
       }
 
-      /* Horizontal snap carousel: one QR centered on screen, sibling peeks at edge (phone). */
-      .qr-scroll {
+      .qr-area {
         display: flex;
-        gap: 14px;
-        margin-inline: -16px;
+        justify-content: center;
         margin-bottom: 24px;
-        overflow-x: auto;
-        overscroll-behavior-x: contain;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        touch-action: pan-x;
-        scrollbar-width: none;
-        /* Slide ~72vw so neighbor peeks; pad to snap first/last to viewport center */
-        --qr-slide: min(280px, 72vw);
-        scroll-padding-inline: max(0px, calc(50vw - var(--qr-slide) / 2));
-        padding-inline: max(0px, calc(50vw - var(--qr-slide) / 2));
-      }
-
-      .qr-scroll::-webkit-scrollbar {
-        display: none;
-      }
-
-      .qr-scroll:focus {
-        outline: none;
-      }
-
-      .qr-scroll:focus-visible {
-        outline: 3px solid var(--focus-ring);
-        outline-offset: 2px;
       }
 
       .qr-panel {
-        flex: 0 0 var(--qr-slide);
-        scroll-snap-align: center;
-        scroll-snap-stop: always;
+        width: 100%;
+        max-width: min(280px, 72vw);
         background: white;
         border: 2px solid var(--border);
         border-radius: 16px;
@@ -138,9 +112,6 @@ class SquirrelPaymentView extends LitElement {
 
       .qr-panel-label.venmo {
         color: var(--venmo);
-      }
-      .qr-panel-label.paypal {
-        color: var(--paypal);
       }
 
       .qr-canvas-wrap {
@@ -216,7 +187,6 @@ class SquirrelPaymentView extends LitElement {
     donationValue: { type: Number },
     total: { type: Number },
     venmoUsername: {},
-    paypalDonateUrl: {},
   };
 
   async updated() {
@@ -250,23 +220,16 @@ class SquirrelPaymentView extends LitElement {
       el.appendChild(canvas);
     };
 
-    await Promise.all([
-      renderQR(
-        '#venmo-qr',
-        '#008CFF',
-        `https://account.venmo.com/${this.venmoUsername}?txn=pay&amount=${amountStr}&note=${encodeURIComponent(
-          // There seems to be a bug on iOS where spaces in the note are not
-          // encoded correctly. This is a workaround to use non-breaking spaces
-          // instead.
-          note.replaceAll(' ', '\u00A0'),
-        )}`,
-      ),
-      renderQR(
-        '#paypal-qr',
-        '#003087',
-        `${this.paypalDonateUrl}&amount=${amountStr}`,
-      ),
-    ]);
+    await renderQR(
+      '#venmo-qr',
+      '#008CFF',
+      `https://account.venmo.com/${this.venmoUsername}?txn=pay&amount=${amountStr}&note=${encodeURIComponent(
+        // There seems to be a bug on iOS where spaces in the note are not
+        // encoded correctly. This is a workaround to use non-breaking spaces
+        // instead.
+        note.replaceAll(' ', '\u00A0'),
+      )}`,
+    );
   }
 
   _emit(type) {
@@ -301,21 +264,11 @@ class SquirrelPaymentView extends LitElement {
               : nothing}
           </div>
 
-          <div
-            class="qr-scroll"
-            role="region"
-            tabindex="0"
-            aria-label="Payment QR codes, swipe to switch between Venmo and PayPal"
-          >
+          <div class="qr-area" role="region" aria-label="Venmo payment QR code">
             <div class="qr-panel">
               <div class="qr-panel-label venmo">Venmo</div>
               <div class="qr-canvas-wrap" id="venmo-qr"></div>
               <div class="qr-handle">@${this.venmoUsername}</div>
-            </div>
-            <div class="qr-panel">
-              <div class="qr-panel-label paypal">PayPal</div>
-              <div class="qr-canvas-wrap" id="paypal-qr"></div>
-              <div class="qr-handle">paypal.com/donate</div>
             </div>
           </div>
         </div>

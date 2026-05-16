@@ -2,7 +2,7 @@
 
 View the app at [lencioni.github.io/squirrel](https://lencioni.github.io/squirrel/).
 
-A mobile-friendly food ordering app for Squirrel Jam. Event workers use it to tally orders and show customers a Venmo or PayPal QR code to pay.
+A mobile-friendly food ordering app for Squirrel Jam. Event workers use it to tally orders and show customers a Venmo QR code to pay.
 
 ## Setup
 
@@ -23,7 +23,6 @@ Opens a local dev server at `http://localhost:5173` with hot module replacement.
 Edit [`config.js`](config.js) to customize the app for your event:
 
 - **`venmoUsername`** — Venmo handle (without @)
-- **`paypalDonateUrl`** — PayPal donation link base URL
 - **`items`** — Menu items with `id`, `name`, `price` (USD), and `emoji`
 - **`quickDonations`** — Amounts shown as quick-add donation buttons
 
